@@ -3,7 +3,6 @@ package db_test
 import (
 	"testing"
 	// _ "github.com/jinzhu/gorm/dialects/sqlite"
-	// _ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "bitbucket.org/skyhark/golang/db/mongodb"
 	"bitbucket.org/skyhark/golang/db"
