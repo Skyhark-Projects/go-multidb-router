@@ -39,12 +39,28 @@ func execTestes(t *testing.T, db_type string, uri string) {
 
 	// Create row
 	assert(t, db.Create(&TestTable{
-		Name: "x",
+		Name: "x test",
 	}))
 
-	assert(t, db.Save(&TestTable{
-		Name: "x2",
-	}))
+	// assert(t, db.Save(&TestTable{
+	// 	Name: "x2",
+	// }))
+
+	// Test counting
+	count := 0
+	assert(t, db.Table("test_tables").Count(&count))
+
+	if count != 1 {
+		t.Fatal("Wrong tables count", count)
+	}
+
+	res := TestTable{}
+	assert(t, db.First(&res))
+	if res.Name != "x test" {
+		t.Fatal("Wrong result found", res.Name)
+	}
+
+	// t.Fatal("test", count)
 }
 
 // Layers:
@@ -56,7 +72,7 @@ func execTestes(t *testing.T, db_type string, uri string) {
 // ----------------------------------------------------------------------------------------
 
 func TestMysql(t *testing.T) {
-	execTestes(t, "mysql", "root:mysql@tcp(0.0.0.0:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
+	// execTestes(t, "mysql", "root:mysql@tcp(0.0.0.0:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
 }
 
 func TestPostgress(t *testing.T) {
@@ -76,7 +92,7 @@ func TestElasticsearch(t *testing.T) {
 }
 
 func TestMongodb(t *testing.T) {
-	// execTestes(t, "mongodb", "mongodb://localhost:27017/testing")
+	execTestes(t, "mongodb", "mongodb://localhost:27017/testing")
 }
 
 func TestLvldb(t *testing.T) {
