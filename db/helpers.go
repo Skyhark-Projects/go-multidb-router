@@ -48,3 +48,25 @@ func (w Where) Final(where ...interface{}) Where {
 		return w
 	}
 }
+
+// --------------
+
+func Int64(val interface{}) int64 {
+	if v, ok := val.(int64); ok {
+		return v
+	} else if v, ok := val.(int32); ok {
+		return int64(v)
+	} else if v, ok := val.(int16); ok {
+		return int64(v)
+	} else if v, ok := val.(int8); ok {
+		return int64(v)
+	} else if v, ok := val.(int); ok {
+		return int64(v)
+	} else if v, ok := val.(float64); ok {
+		return int64(v)
+	} else if v, ok := val.(float32); ok {
+		return int64(v)
+	} else {
+		panic("Could not parse int64 type")
+	}
+}

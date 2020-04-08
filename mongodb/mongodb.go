@@ -13,8 +13,9 @@ import (
 type MongoDB struct {
 	*mongo.Database
 
-	where db.Where
-	table string
+	where Where
+	table *mongo.Collection
+	options options.FindOptions
 }
 
 // -----------
@@ -31,7 +32,7 @@ func (m MongoDB) Close() error {
 // -----------
 
 func (m MongoDB) Begin() db.DB {
-	return nil // ToDo
+	return m // ToDo prepare bulk query
 }
 
 func (m MongoDB) Commit() error {
@@ -45,9 +46,7 @@ func (m MongoDB) Rollback() error {
 // -----------
 
 func (m MongoDB) Count(output interface{}) error {
-	collection := m.Collection( m.table )
-	count, err := collection.CountDocuments(context.Background(), m.filters())
-
+	count, err := m.table.CountDocuments(context.Background(), m.where)
 	if err == nil {
 		reflect.ValueOf(output).Elem().SetInt(count)
 	}
@@ -60,7 +59,11 @@ func (m MongoDB) Create(value interface{}) error {
 		return nil
 	}
 
-	collection := m.Collection( db.TableName(value) )
+	collection := m.table
+	if collection == nil {
+		collection = m.Collection( db.TableName(value) )
+	}
+
 	_, err := collection.InsertOne(context.Background(), value)
 	// id := res.InsertedID
 
@@ -71,7 +74,11 @@ func (m MongoDB) Create(value interface{}) error {
 }
 
 func (m MongoDB) Delete(value interface{}, where ...interface{}) error {
-	collection := m.Collection( db.TableName(value) )
+	collection := m.table
+	if collection == nil {
+		collection = m.Collection( db.TableName(value) )
+	}
+
 	_, err := collection.DeleteMany(context.Background(), m.where.Final(where...), nil)
 	return err
 }
@@ -90,10 +97,12 @@ func (m MongoDB) Update(value ...interface{}) error {
 // -----------
 
 func (m MongoDB) Find(out interface{}, where ...interface{}) error {
-	collection := m.Collection( db.TableName(out) )
+	collection := m.table
+	if collection == nil {
+		collection = m.Collection( db.TableName(out) )
+	}
 
-	// ToDo merge where clause
-	cursor, err := collection.Find(context.Background(), m.filters())
+	cursor, err := collection.Find(context.Background(), m.where.Final(where...), &m.options)
 	if err != nil {
 		return err
 	}
@@ -102,18 +111,33 @@ func (m MongoDB) Find(out interface{}, where ...interface{}) error {
 }
 
 func (m MongoDB) First(out interface{}, where ...interface{}) error {
-	collection := m.Collection( db.TableName(out) )
+	collection := m.table
+	if collection == nil {
+		collection = m.Collection( db.TableName(out) )
+	}
 
-	// ToDo merge where clause
-	return collection.FindOne(context.Background(), m.filters()).Decode(out)
+	op := &options.FindOneOptions{
+		Skip: m.options.Skip,
+		Sort: m.options.Sort,
+		Projection: m.options.Projection,
+	}
+
+	return collection.FindOne(context.Background(), m.where.Final(where...), op).Decode(out)
 }
 
 func (m MongoDB) FirstOrCreate(out interface{}, where ...interface{}) error {
-	return errors.New("not supported yet")
+	if err := m.First(out); err != nil && err.Error() == "ErrNoDocuments" {
+		return m.Create(out)
+	} else if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m MongoDB) Last(out interface{}, where ...interface{}) error {
-	return errors.New("not supported yet")
+	m.options.Sort = map[string]int{ "$natural": -1 }
+	return m.First(out, where)
 }
 
 // -----------
@@ -123,7 +147,8 @@ func (m MongoDB) Preload(column string) db.DB {
 }
 
 func (m MongoDB) Model(in interface{}) db.DB {
-	return nil
+	m.table = m.Collection( db.TableName(in) )
+	return m
 }
 
 func (m MongoDB) Select(query interface{}, args ...interface{}) db.DB {
@@ -145,49 +170,37 @@ func (m MongoDB) Having(query interface{}, values ...interface{}) db.DB {
 // -----------
 
 func (m MongoDB) Offset(offset interface{}) db.DB {
-	return nil
+	of := db.Int64(offset)
+	m.options.Skip = &of
+	return m
 }
 
 func (m MongoDB) Limit(limit interface{}) db.DB {
-	return nil
+	of := db.Int64(limit)
+	m.options.Limit = &of
+	return m
 }
 
 func (m MongoDB) Table(name string) db.DB {
-	db := m.copy()
-	db.table = name
-	return db
+	m.table = m.Collection(name)
+	return m
 }
 
 // -----------
 
 func (m MongoDB) Not(query interface{}, args ...interface{}) db.DB {
-	db := m.copy()
-	db.where = m.where.Not(query, args...)
-	return db
+	m.where = m.where.Not(query, args...)
+	return m
 }
 
 func (m MongoDB) Or(query interface{}, args ...interface{}) db.DB {
-	db := m.copy()
-	db.where = m.where.Or(query, args...)
-	return db
+	m.where = m.where.Or(query, args...)
+	return m
 }
 
 func (m MongoDB) Where(query interface{}, args ...interface{}) db.DB {
-	db := m.copy()
-	db.where = m.where.And(query, args...)
-	return db
-}
-
-func (m MongoDB) copy() MongoDB {
-	return MongoDB{
-		Database: m.Database,
-		where: 	  m.where,
-		table: 	  m.table,
-	}
-}
-
-func (m MongoDB) filters() interface{} {
-	return /*m.where*/ map[string]string{} // ToDo convert where clause to mongodb filter
+	m.where = m.where.And(query, args...)
+	return m
 }
 
 // -----------

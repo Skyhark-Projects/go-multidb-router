@@ -42,6 +42,10 @@ func execTestes(t *testing.T, db_type string, uri string) {
 		Name: "x test",
 	}))
 
+	assert(t, db.Create(&TestTable{
+		Name: "x tc",
+	}))
+
 	// assert(t, db.Save(&TestTable{
 	// 	Name: "x2",
 	// }))
@@ -50,7 +54,7 @@ func execTestes(t *testing.T, db_type string, uri string) {
 	count := 0
 	assert(t, db.Table("test_tables").Count(&count))
 
-	if count != 1 {
+	if count != 2 {
 		t.Fatal("Wrong tables count", count)
 	}
 
@@ -58,6 +62,18 @@ func execTestes(t *testing.T, db_type string, uri string) {
 	assert(t, db.First(&res))
 	if res.Name != "x test" {
 		t.Fatal("Wrong result found", res.Name)
+	}
+
+	res2 := TestTable{}
+	assert(t, db.Last(&res2))
+	if res2.Name != "x tc" {
+		t.Fatal("Wrong last result found", res2.Name)
+	}
+
+	res = TestTable{}
+	assert(t, db.Where(TestTable{ Name: "x tc" }).First(&res))
+	if res.Name != "x tc" {
+		t.Fatal("Wrong where clause", res.Name)
 	}
 
 	// t.Fatal("test", count)
