@@ -5,15 +5,21 @@ import (
 )
 
 type KeyValueHandler interface {
-	// Get(table string, key []byte) (interface{}, error)
-	// Put(table string, key []byte, val interface{}) error
-	// Delete()
+	// Has(table string, key []byte) (bool, error)
+	Get(table string, key []byte) (interface{}, error)
+	Put(table string, key []byte, val interface{}) error
+	Delete(table string, key []byte) error
 	Close() error
-	// Open()
 }
 
 type KeyValueDB struct {
 	handler KeyValueHandler
+}
+
+func NewKeyValueDb(handler KeyValueHandler) KeyValueDB {
+	return KeyValueDB{
+		handler: handler,
+	}
 }
 
 func (es KeyValueDB) AutoMigrate(values ...interface{}) error {
@@ -84,6 +90,14 @@ func (es KeyValueDB) Last(out interface{}, where ...interface{}) error {
 }
 
 // -----------
+
+func (es KeyValueDB) Preload(column string) DB {
+	return nil
+}
+
+func (es KeyValueDB) Model(in interface{}) DB {
+	return nil
+}
 
 func (es KeyValueDB) Select(query interface{}, args ...interface{}) DB {
 	return nil

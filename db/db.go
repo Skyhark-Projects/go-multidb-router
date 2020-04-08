@@ -27,6 +27,9 @@ type DB interface {
 	// Rows() (*sql.Rows, error)
 	// GetErrors() []error
 
+	Preload(column string) DB
+	Model(in interface{}) DB
+
 	Select(query interface{}, args ...interface{}) DB
 	Joins(query string, args ...interface{}) DB
 	Group(query string) DB

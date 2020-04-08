@@ -1,7 +1,7 @@
 package mongodb
 
 import (
-	"bitbucket.org/skyhark/golang/db"
+	"github.com/Skyhark-Projects/go-multidb-router/db"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"context"
@@ -97,6 +97,14 @@ func (m MongoDB) Last(out interface{}, where ...interface{}) error {
 }
 
 // -----------
+
+func (m MongoDB) Preload(column string) db.DB {
+	return nil
+}
+
+func (m MongoDB) Model(in interface{}) db.DB {
+	return nil
+}
 
 func (m MongoDB) Select(query interface{}, args ...interface{}) db.DB {
 	return nil

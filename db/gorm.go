@@ -80,6 +80,18 @@ func (g GormDB) Last(out interface{}, where ...interface{}) error {
 
 // -----------
 
+func (g GormDB) Preload(column string) DB {
+	return GormDB{
+		DB: g.DB.Preload(column),
+	}
+}
+
+func (g GormDB) Model(in interface{}) DB {
+	return GormDB{
+		DB: g.DB.Model(in),
+	}
+}
+
 func (g GormDB) Select(query interface{}, args ...interface{}) DB {
 	return GormDB{
 		DB: g.DB.Select(query, args...),

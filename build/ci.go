@@ -39,7 +39,7 @@ import (
 	"runtime"
 	"strings"
 
-	build "bitbucket.org/skyhark/golang/build/internal"
+	build "github.com/Skyhark-Projects/go-multidb-router/build/internal"
 )
 
 var (

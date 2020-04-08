@@ -7,7 +7,8 @@ if [ ! -d ./vendor ]; then
     echo "installing vendor packages.."
     go get github.com/jinzhu/gorm \
            go.mongodb.org/mongo-driver/mongo \
-           github.com/go-sql-driver/mysql
+           github.com/go-sql-driver/mysql \
+           github.com/syndtr/goleveldb/leveldb
 
     mv src vendor
     echo "vendor packages installed"

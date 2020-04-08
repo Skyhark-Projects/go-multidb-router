@@ -1,7 +1,7 @@
 package mongodb
 
 import (
-	"bitbucket.org/skyhark/golang/db"
+	"github.com/Skyhark-Projects/go-multidb-router/db"
 	"errors"
 )
 
@@ -79,6 +79,14 @@ func (es Elasticsearch) Last(out interface{}, where ...interface{}) error {
 }
 
 // -----------
+
+func (es Elasticsearch) Preload(column string) db.DB {
+	return nil
+}
+
+func (es Elasticsearch) Model(in interface{}) db.DB {
+	return nil
+}
 
 func (es Elasticsearch) Select(query interface{}, args ...interface{}) db.DB {
 	return nil

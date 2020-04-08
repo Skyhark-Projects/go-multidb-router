@@ -10,11 +10,11 @@ fi
 # Create fake Go workspace if it doesn't exist yet.
 workspace="$PWD/build/_workspace"
 root="$PWD"
-ethdir="$workspace/src/bitbucket.org/skyhark"
-if [ ! -L "$ethdir/golang" ]; then
+ethdir="$workspace/src/github.com/Skyhark-Projects"
+if [ ! -L "$ethdir/go-multidb-router" ]; then
     mkdir -p "$ethdir"
     cd "$ethdir"
-    ln -s ../../../../../. golang
+    ln -s ../../../../../. go-multidb-router
     cd "$root"
 fi
 
@@ -23,8 +23,8 @@ GOPATH="$workspace"
 export GOPATH
 
 # Run the command inside the workspace.
-cd "$ethdir/golang"
-PWD="$ethdir/golang"
+cd "$ethdir/go-multidb-router"
+PWD="$ethdir/go-multidb-router"
 
 # Launch the arguments with the configured environment.
 exec "$@"

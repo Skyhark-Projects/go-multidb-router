@@ -4,8 +4,13 @@ import (
 	"testing"
 	// _ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "bitbucket.org/skyhark/golang/db/mongodb"
-	"bitbucket.org/skyhark/golang/db"
+	_ "github.com/Skyhark-Projects/go-multidb-router/mongodb"
+	_ "github.com/Skyhark-Projects/go-multidb-router/elasticsearch"
+	_ "github.com/Skyhark-Projects/go-multidb-router/lvldb"
+	_ "github.com/Skyhark-Projects/go-multidb-router/memcached"
+	_ "github.com/Skyhark-Projects/go-multidb-router/memory"
+	_ "github.com/Skyhark-Projects/go-multidb-router/redis"
+	"github.com/Skyhark-Projects/go-multidb-router/db"
 )
 
 func assert(t *testing.T, e error) {
